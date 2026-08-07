@@ -1,66 +1,73 @@
 # adversarial-physics-audit
 
-An agent skill that runs a maximally adversarial correctness audit of a
-physics, simulation, or numerical library. It exists to answer one
-question honestly: **"How do you KNOW this code is correct — that it
-wasn't hallucinated, that the test data isn't hardcoded?"**
+An agent skill that runs an adversarial, evidence-disciplined
+correctness audit of a physics, simulation, scientific-computing, or
+numerical library. It exists to answer one question honestly: **"How
+do you KNOW this code is correct — that it wasn't hallucinated, that
+the test data isn't hardcoded?"**
 
-The auditor's working hypothesis is that the library is an elaborate
-fake, held until the evidence forces it off that position. Docs and
-READMEs are treated as the claims under indictment, not as evidence.
+The auditor assumes the implementation may be wrong until evidence
+forces it off that position. Docs and READMEs are treated as claims,
+not evidence. The hostile posture generates experiments, not
+accusations: suspicious patterns and evidence gaps are never reported
+as fabrication without affirmative evidence.
 
 Works with any agent that reads the open SKILL.md format (Claude Code,
 Codex CLI, and others).
 
 ## What the audit does
 
-1. **Maps the target** — inventories every quantitative claim, every
+1. **Maps the target** — inventories every in-scope quantitative claim,
+   the numerical environment, every selected configuration, every
    test (including ignored/uncompiled ones), all reference data with
    its claimed provenance, all oracles, and the governing equations.
-   The claim list becomes an indictment sheet; every claim gets a
-   verdict.
-2. **Mutation analysis** — the decisive experiment. Seeds deliberate
-   physics bugs (sign-flipped restoring terms, perturbed constants,
-   transposed couplings, frozen integrator sub-states, corrupted data
-   with updated checksums) and scores whether any test catches each
-   one. A surviving mutation names a claim the suite does not actually
-   test.
+   Every in-scope claim gets a verdict; exclusions and sampling are
+   explicit.
+2. **Controlled mutation analysis** — establishes a stable baseline,
+   then seeds one deliberate physics bug at a time in a disposable tree:
+   sign-flipped restoring terms, perturbed constants, transposed
+   couplings, frozen integrator sub-states, or corrupted data. It
+   verifies reachability, rebuilds, classifies invalid/equivalent/flaky
+   mutants, and restores the baseline before drawing conclusions.
 3. **Hardcoded-expectation hunting** — traces the origin of every
    expected value in the tests, reconstructs tolerance history from
    version control, and flags vacuous or tautological assertions.
-4. **Circularity analysis** — maps everything shared between the code
-   and its "independent" oracles or second implementations, then
-   cross-checks with physics neither side defines: analytic limits,
-   conservation laws, symmetry, convergence order, dimensional
-   consistency.
-5. **Data provenance** — treats checksums as self-consistency only,
-   spot-checks reference data against primary sources, and hunts
-   fabrication signatures (too-smooth values, repeated digit patterns,
-   impossible precision).
-6. **Claims audit** — benchmarks that do real work, fallbacks that
-   fail loudly, and a finding for every uncited superlative.
+4. **Circularity analysis** — grades oracle independence across shared
+   equations, data, conventions, dependencies, calibration, and
+   authorship, then checks model-specific invariants with their
+   boundary-condition and forcing preconditions stated.
+5. **Numerical and statistical integrity** — examines error budgets,
+   conditioning, absolute/relative metrics, convergence regimes,
+   precision and hardware effects, stochastic power, and flakiness.
+6. **Data provenance** — treats checksums as self-consistency only and
+   separately checks source authority, transcription, transformations,
+   and applicability. Suspicious numeric patterns are screening signals,
+   not proof.
+7. **Claims audit** — when relevant, checks benchmarks that do real
+   work, fallbacks that fail loudly, and a finding for every uncited
+   superlative.
 
-The report is ranked most-damning-first with a fixed severity
-taxonomy: fabrication, circular validation, vacuous test, tolerance
-gaming, unsupported claim, honest-but-overstated, verified.
+The report keeps verdict, finding type, impact, and confidence separate;
+labels evidence as reproduced, derived, primary-sourced, inferred, or
+unverified; and includes reusable claim, mutation, oracle, and provenance
+ledgers.
 
-### Two modes
+### Three modes
 
 - **Execution mode** — the agent builds, runs tests, seeds mutations,
   regenerates fixtures. Anything not personally reproduced is reported
   as unverified.
 - **Static mode** — for read-only access. The words "passes" and
-  "works" are banned; verdicts are limited to *traceable* /
-  *untraceable* / *contradicted*, and mutation analysis is done on
-  paper by tracing which assertion would catch each defect. The report
-  must end with an explicit list of what could not be established
-  without execution.
+  "works" are banned; evidence is *artifact-traceable* /
+  *untraceable* / *contradicted*, and mutation predictions are
+  *predicted-caught* / *predicted-uncaught* / *indeterminate*.
+- **Mixed mode** — execution verdicts apply only to reproduced
+  configurations; everything else retains static evidence labels.
 
-Two standing rules guard against the auditor's own failure modes: it
-may not trust its own memory of physical constants or paper contents
-(every reference number must be derived or fetched during the audit),
-and a doc citing a test is a pointer, not a fact — it must follow the
-pointer and quote what is actually there.
+Three standing rules guard against the auditor's own failure modes: do
+not trust memory of constants or papers; treat docs as pointers rather
+than facts; and keep reproduced, derived, sourced, inferred, and
+unverified evidence distinct.
 
 ## Install
 
