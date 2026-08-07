@@ -76,7 +76,8 @@ test directories, build scripts, and CI configuration:
   data-flow between it and the code under test.
 - **Governing equations**: what physics the library claims to
   implement, including boundary conditions, forcing, conventions, and
-  numerical method.
+  numerical method — and the cited source for each equation, for
+  verification in section 3.
 - **Environment**: commit, branch, dirty state, dependency lockfiles,
   compiler/interpreter, precision mode, hardware backend, and relevant
   runtime settings.
@@ -147,7 +148,35 @@ defective path.
   supporting assertion addresses the same quantity and admits weaker
   error than the claim permits.
 
-## 3. Oracle and differential-test circularity
+## 3. Governing-equation verification
+
+Consistency with the claimed model is not evidence the claimed model
+is the true model: a faithfully implemented wrong equation satisfies
+its own invariants beautifully. The equations themselves are claims;
+audit them against primary sources fetched during the audit.
+
+- For each governing equation, closure, and empirical correlation,
+  obtain the authoritative form from a high-quality primary source —
+  the cited paper or a standard reference text — during the audit,
+  never from memory. Record source, edition or version, equation
+  number, and page.
+- The citation is itself a claim. Confirm the source exists, actually
+  contains the equation attributed to it, and is being applied inside
+  its stated validity regime and assumptions (flow regime, linearity,
+  frames, boundary conditions, parameter ranges).
+- Write out the sourced equation and check the implementation against
+  it term by term: every term present, no undisclosed extra or dropped
+  terms, each sign, prefactor, and nondimensionalization correct, and
+  conventions consistent with the code's declared ones. Cite code
+  file:line per term.
+- Where no primary source can be fetched, derive the equation from
+  first principles when feasible (show the derivation); otherwise mark
+  every dependent claim "equation unverified" — do not soften it.
+- Classify each discrepancy precisely: transcription error,
+  undisclosed simplification, regime violation, or unverifiable
+  citation.
+
+## 4. Oracle and differential-test circularity
 
 - Map shared equations, constants/data, conventions, conditioning,
   intermediate files, dependencies, calibration data, authorship, and
@@ -161,7 +190,7 @@ defective path.
   not assume zero response, conservation, positivity, or symmetry when
   the model does not require it.
 
-## 4. Numerical and statistical integrity
+## 5. Numerical and statistical integrity
 
 - Build an error budget separating discretization, iteration,
   roundoff, model, measurement, and reference-solution error where
@@ -181,7 +210,7 @@ defective path.
   intervals, effect size, test power, and multiple-comparison handling.
   Distinguish stochastic flakiness from a stable scientific failure.
 
-## 5. Reference-data provenance
+## 6. Reference-data provenance
 
 - Checksums prove self-consistency only. Separately assess source
   authority, transcription integrity, transformation reproducibility,
@@ -198,7 +227,7 @@ defective path.
 - Read generation/export scripts for undisclosed synthesis,
   extrapolation, smoothing, or "repair" of data before writing.
 
-## 6. Performance and engineering claims
+## 7. Performance and engineering claims
 
 - Audit this phase only when performance or engineering claims are in
   scope. Give uncited superlatives ("fastest", "most accurate") their
@@ -209,7 +238,7 @@ defective path.
   region. Force failure paths and confirm fallbacks are loud (typed,
   reported), never silent degradation.
 
-## 7. The report
+## 8. The report
 
 Use [references/report-template.md](references/report-template.md).
 Rank adverse findings by impact, but keep these fields independent:
@@ -218,8 +247,9 @@ Rank adverse findings by impact, but keep these fields independent:
   or out of scope. In static mode use artifact-traceable, untraceable,
   or contradicted instead.
 - **Finding type**: circular oracle, vacuous test, provenance gap,
-  tolerance mismatch, mutation survivor, unsupported claim, or another
-  precise mechanism.
+  tolerance mismatch, mutation survivor, equation-transcription error,
+  regime violation, unverifiable citation, unsupported claim, or
+  another precise mechanism.
 - **Impact**: critical, high, medium, or low.
 - **Confidence**: high, medium, or low.
 
@@ -227,8 +257,9 @@ Reserve fabrication for a separately justified allegation backed by
 affirmative evidence. Every finding must cite exact file:line, commit,
 primary-source location, command output, or shown derivation; label the
 evidence class; and name the documented claims affected. Include the
-full mutation table, oracle-independence table, and a claim-by-claim
-verdict for the Phase-0 ledger.
+full mutation table, oracle-independence table, equation-verification
+ledger (equation → source location → term-by-term result), and a
+claim-by-claim verdict for the Phase-0 ledger.
 
 In static or mixed mode, list everything execution could not establish.
 End with exact commands and results, environment details, branch,

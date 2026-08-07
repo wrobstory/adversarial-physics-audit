@@ -29,21 +29,29 @@ Codex CLI, and others).
    couplings, frozen integrator sub-states, or corrupted data. It
    verifies reachability, rebuilds, classifies invalid/equivalent/flaky
    mutants, and restores the baseline before drawing conclusions.
-3. **Hardcoded-expectation hunting** — traces the origin of every
+3. **Governing-equation verification** — treats the equations
+   themselves as claims: fetches the authoritative form of each cited
+   equation from a primary source during the audit (the citation's
+   existence and content are also verified), then checks the
+   implementation term by term — presence, signs, prefactors,
+   nondimensionalization, and validity regime. Consistency with the
+   claimed model is never accepted as evidence the claimed model is
+   the true model.
+4. **Hardcoded-expectation hunting** — traces the origin of every
    expected value in the tests, reconstructs tolerance history from
    version control, and flags vacuous or tautological assertions.
-4. **Circularity analysis** — grades oracle independence across shared
+5. **Circularity analysis** — grades oracle independence across shared
    equations, data, conventions, dependencies, calibration, and
    authorship, then checks model-specific invariants with their
    boundary-condition and forcing preconditions stated.
-5. **Numerical and statistical integrity** — examines error budgets,
+6. **Numerical and statistical integrity** — examines error budgets,
    conditioning, absolute/relative metrics, convergence regimes,
    precision and hardware effects, stochastic power, and flakiness.
-6. **Data provenance** — treats checksums as self-consistency only and
+7. **Data provenance** — treats checksums as self-consistency only and
    separately checks source authority, transcription, transformations,
    and applicability. Suspicious numeric patterns are screening signals,
    not proof.
-7. **Claims audit** — when relevant, checks benchmarks that do real
+8. **Claims audit** — when relevant, checks benchmarks that do real
    work, fallbacks that fail loudly, and a finding for every uncited
    superlative.
 
