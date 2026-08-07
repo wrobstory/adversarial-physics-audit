@@ -1,0 +1,4 @@
+interface:
+  display_name: "Adversarial Physics Audit"
+  short_description: "Red-team numerical and scientific validation"
+  default_prompt: "Use $adversarial-physics-audit to test whether this numerical library’s correctness claims withstand an evidence-disciplined hostile review."
