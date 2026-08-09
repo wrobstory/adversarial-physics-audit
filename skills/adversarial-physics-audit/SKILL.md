@@ -44,6 +44,14 @@ Three standing rules about your own limits:
    reproduced, independently derived, primary-sourced, inferred, or
    unverified. Never promote an inference because it fits the hostile
    hypothesis.
+4. **A suspect is cleared only by an experiment with power against it.**
+   Before recording "checked X — not the cause", state what result would
+   have confirmed X, and confirm the experiment you ran could have
+   produced that result. A static test can never clear a dynamics
+   hypothesis; an agreement between two artifacts that share the suspect
+   lineage can never clear a common-mode hypothesis. If no available
+   experiment has power against X, the verdict is "unresolved", not
+   "cleared" — and X stays on the suspect list.
 
 Unless the user separately authorizes remediation, do not fix findings.
 Make mutations only in a disposable worktree or copy; never overwrite
@@ -118,6 +126,12 @@ governing terms and conventions with applicable perturbations such as:
   patch, surface tag, data column, crop range) — tests whether the
   pipeline has integrity gates or silently computes on incomplete
   domains.
+- One declared reference changed without changing values — move a
+  rotation/moment reference point, flip a frame declaration, or shift a
+  phase origin while leaving every numeric artifact untouched. Tests
+  whether composition enforces reference consistency or silently
+  produces a different physical system. Value mutations cannot expose
+  this class; only reference mutations can.
 - Correlated instead of independent random draws where independence is
   a stated model assumption.
 
@@ -263,6 +277,24 @@ audit them against primary sources fetched during the audit.
     crop ranges) require a recorded rationale and a completeness check.
     An unexplained magic subset of a source artifact is a provenance
     gap even when the result "looks right".
+- **Cross-artifact reference consistency.** Every quantity that is only
+  meaningful relative to a reference — an inertia about a point, a moment
+  about a point, a phase about an origin, a z-signed scalar in a frame, a
+  value in a unit system — carries that reference implicitly. Two
+  artifacts can each be individually correct and jointly wrong. For every
+  composition of such artifacts (mass matrix + force integration point,
+  hull frame + loading frame, phase convention + phase origin):
+  - find where each side's reference is declared, and whether composition
+    VERIFIES they match or merely assumes it;
+  - demand a transfer identity where one exists (transforming the
+    quantity between references must be exact: wrench transfer, spatial
+    inertia parallel-axis transform, frame conversion round-trip) and
+    check a test asserts it;
+  - treat "declared but not enforced" and "parsed but not applied" as
+    LIVE defects until an experiment with power shows every shipped
+    configuration satisfies the contract — not as API-hygiene notes.
+    Value-level correctness of both sides is not evidence of joint
+    consistency.
 - **Gross-deviation differential diagnosis.** When a computed quantity
   for a well-characterized system misses an independent reference by
   far more than the plausible error budget, the null hypothesis is a
@@ -303,6 +335,13 @@ Rank adverse findings by impact, but keep these fields independent:
   "diagnostic only" caveats is rated by the consequences of the wrong
   conclusion (abandoned datasets, unnecessary procurement, a fixable
   defect left standing), not by the modesty of its wrapper.
+  An unenforced contract is rated by the shipped configurations, not the
+  API: if any committed scenario, fixture, or campaign plausibly violates
+  a declared-but-unverified contract, rate the finding as if the
+  violation is real until an experiment with power rules it out. "A
+  caller could misuse this" and "the flagship campaign is misusing this
+  right now" are different findings; do the work to determine which one
+  you have.
 - **Confidence**: high, medium, or low.
 
 Reserve fabrication for a separately justified allegation backed by
