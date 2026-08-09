@@ -12,6 +12,17 @@ the code's own output, or tolerances widened until green. Treat docs
 and READMEs as claims under indictment, not evidence. Do not summarize
 the test suite; try to break it.
 
+Hostility is symmetric. An adverse self-report ("our fixture fails
+fidelity", "the source data is deficient", "diagnostic only") is not
+evidence of honesty — it contains a causal attribution, and that
+attribution is a claim under the same indictment as any "it works".
+Honest labeling of a failure does not verify the *explanation* of the
+failure; a pipeline defect misdiagnosed as a data deficiency survives
+every consistency check precisely because nothing was over-claimed.
+Audit the attribution: reproduce the failure, then test whether the
+defect lives in the pipeline that computed it before accepting that it
+lives in the data.
+
 Use hostility to generate experiments, not accusations. Missing
 provenance, suspicious patterns, and surviving mutations are evidence
 gaps, not proof of fabrication. Reserve **fabrication** for affirmative
@@ -103,6 +114,10 @@ governing terms and conventions with applicable perturbations such as:
   disposable copy. Update its checksum only when testing a claimed
   integrity or independent-validation mechanism.
 - A factor-of-2 in one empirical/semi-empirical component.
+- One element dropped from a domain-construction selection (a geometry
+  patch, surface tag, data column, crop range) — tests whether the
+  pipeline has integrity gates or silently computes on incomplete
+  domains.
 - Correlated instead of independent random draws where independence is
   a stated model assumption.
 
@@ -210,7 +225,7 @@ audit them against primary sources fetched during the audit.
   intervals, effect size, test power, and multiple-comparison handling.
   Distinguish stochastic flakiness from a stable scientific failure.
 
-## 6. Reference-data provenance
+## 6. Reference-data provenance and domain construction
 
 - Checksums prove self-consistency only. Separately assess source
   authority, transcription integrity, transformation reproducibility,
@@ -226,6 +241,37 @@ audit them against primary sources fetched during the audit.
   not soften it.
 - Read generation/export scripts for undisclosed synthesis,
   extrapolation, smoothing, or "repair" of data before writing.
+- **Domain construction.** Every pipeline that turns a source artifact
+  into a computational representation — meshing, clipping, scaling,
+  unit conversion, datum mapping, resampling, digitization — is itself
+  under audit, upstream of all physics:
+  - Verify units, scale, and datum against at least two independent
+    published dimensions of the system (two different axes or
+    features, not one quantity the scale factor was fitted to). A
+    transform validated against only the quantity used to derive it
+    is unvalidated.
+  - Check geometric closure where the physics assumes it: a clipped or
+    immersed mesh must have no open boundaries other than the declared
+    cut. Count boundary edges, quantify open-seam length, and treat
+    integral quantities (volume, area, mass) computed on a non-closed
+    domain as invalid, not approximate.
+  - Cross-check one conserved integral against an independently
+    published value for canonical systems (a domain's computed volume,
+    area, mass, or total charge vs its documented value). This is the
+    cheapest whole-pipeline test that exists; its absence is a finding.
+  - Hardcoded selections (surface/patch tags, column indices, band or
+    crop ranges) require a recorded rationale and a completeness check.
+    An unexplained magic subset of a source artifact is a provenance
+    gap even when the result "looks right".
+- **Gross-deviation differential diagnosis.** When a computed quantity
+  for a well-characterized system misses an independent reference by
+  far more than the plausible error budget, the null hypothesis is a
+  defect in the computation, not in the reference or source artifact.
+  Before accepting any attribution to external data, walk the standard
+  defect ladder and show your work: units → scale → datum → selection/
+  closure → sign/convention → the data itself. "Source data deficient"
+  requires the same affirmative evidence bar as "fabrication"; a gate
+  failure alone attributes nothing.
 
 ## 7. Performance and engineering claims
 
@@ -248,9 +294,15 @@ Rank adverse findings by impact, but keep these fields independent:
   or contradicted instead.
 - **Finding type**: circular oracle, vacuous test, provenance gap,
   tolerance mismatch, mutation survivor, equation-transcription error,
-  regime violation, unverifiable citation, unsupported claim, or
-  another precise mechanism.
-- **Impact**: critical, high, medium, or low.
+  regime violation, unverifiable citation, unsupported claim,
+  misattributed discrepancy (the deviation is real but blamed on the
+  wrong cause — e.g. a pipeline defect reported as a source-data
+  deficiency), or another precise mechanism.
+- **Impact**: critical, high, medium, or low. Conservative labeling
+  does not cap impact: a wrong causal attribution wrapped in honest
+  "diagnostic only" caveats is rated by the consequences of the wrong
+  conclusion (abandoned datasets, unnecessary procurement, a fixable
+  defect left standing), not by the modesty of its wrapper.
 - **Confidence**: high, medium, or low.
 
 Reserve fabrication for a separately justified allegation backed by
