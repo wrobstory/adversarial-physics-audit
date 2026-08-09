@@ -12,6 +12,17 @@ the code's own output, or tolerances widened until green. Treat docs
 and READMEs as claims under indictment, not evidence. Do not summarize
 the test suite; try to break it.
 
+Hostility is symmetric. An adverse self-report ("our fixture fails
+fidelity", "the source data is deficient", "diagnostic only") is not
+evidence of honesty — it contains a causal attribution, and that
+attribution is a claim under the same indictment as any "it works".
+Honest labeling of a failure does not verify the *explanation* of the
+failure; a pipeline defect misdiagnosed as a data deficiency survives
+every consistency check precisely because nothing was over-claimed.
+Audit the attribution: reproduce the failure, then test whether the
+defect lives in the pipeline that computed it before accepting that it
+lives in the data.
+
 Use hostility to generate experiments, not accusations. Missing
 provenance, suspicious patterns, and surviving mutations are evidence
 gaps, not proof of fabrication. Reserve **fabrication** for affirmative
@@ -76,7 +87,8 @@ test directories, build scripts, and CI configuration:
   data-flow between it and the code under test.
 - **Governing equations**: what physics the library claims to
   implement, including boundary conditions, forcing, conventions, and
-  numerical method.
+  numerical method — and the cited source for each equation, for
+  verification in section 3.
 - **Environment**: commit, branch, dirty state, dependency lockfiles,
   compiler/interpreter, precision mode, hardware backend, and relevant
   runtime settings.
@@ -102,6 +114,10 @@ governing terms and conventions with applicable perturbations such as:
   disposable copy. Update its checksum only when testing a claimed
   integrity or independent-validation mechanism.
 - A factor-of-2 in one empirical/semi-empirical component.
+- One element dropped from a domain-construction selection (a geometry
+  patch, surface tag, data column, crop range) — tests whether the
+  pipeline has integrity gates or silently computes on incomplete
+  domains.
 - Correlated instead of independent random draws where independence is
   a stated model assumption.
 
@@ -147,7 +163,35 @@ defective path.
   supporting assertion addresses the same quantity and admits weaker
   error than the claim permits.
 
-## 3. Oracle and differential-test circularity
+## 3. Governing-equation verification
+
+Consistency with the claimed model is not evidence the claimed model
+is the true model: a faithfully implemented wrong equation satisfies
+its own invariants beautifully. The equations themselves are claims;
+audit them against primary sources fetched during the audit.
+
+- For each governing equation, closure, and empirical correlation,
+  obtain the authoritative form from a high-quality primary source —
+  the cited paper or a standard reference text — during the audit,
+  never from memory. Record source, edition or version, equation
+  number, and page.
+- The citation is itself a claim. Confirm the source exists, actually
+  contains the equation attributed to it, and is being applied inside
+  its stated validity regime and assumptions (flow regime, linearity,
+  frames, boundary conditions, parameter ranges).
+- Write out the sourced equation and check the implementation against
+  it term by term: every term present, no undisclosed extra or dropped
+  terms, each sign, prefactor, and nondimensionalization correct, and
+  conventions consistent with the code's declared ones. Cite code
+  file:line per term.
+- Where no primary source can be fetched, derive the equation from
+  first principles when feasible (show the derivation); otherwise mark
+  every dependent claim "equation unverified" — do not soften it.
+- Classify each discrepancy precisely: transcription error,
+  undisclosed simplification, regime violation, or unverifiable
+  citation.
+
+## 4. Oracle and differential-test circularity
 
 - Map shared equations, constants/data, conventions, conditioning,
   intermediate files, dependencies, calibration data, authorship, and
@@ -161,7 +205,7 @@ defective path.
   not assume zero response, conservation, positivity, or symmetry when
   the model does not require it.
 
-## 4. Numerical and statistical integrity
+## 5. Numerical and statistical integrity
 
 - Build an error budget separating discretization, iteration,
   roundoff, model, measurement, and reference-solution error where
@@ -181,7 +225,7 @@ defective path.
   intervals, effect size, test power, and multiple-comparison handling.
   Distinguish stochastic flakiness from a stable scientific failure.
 
-## 5. Reference-data provenance
+## 6. Reference-data provenance and domain construction
 
 - Checksums prove self-consistency only. Separately assess source
   authority, transcription integrity, transformation reproducibility,
@@ -197,8 +241,39 @@ defective path.
   not soften it.
 - Read generation/export scripts for undisclosed synthesis,
   extrapolation, smoothing, or "repair" of data before writing.
+- **Domain construction.** Every pipeline that turns a source artifact
+  into a computational representation — meshing, clipping, scaling,
+  unit conversion, datum mapping, resampling, digitization — is itself
+  under audit, upstream of all physics:
+  - Verify units, scale, and datum against at least two independent
+    published dimensions of the system (two different axes or
+    features, not one quantity the scale factor was fitted to). A
+    transform validated against only the quantity used to derive it
+    is unvalidated.
+  - Check geometric closure where the physics assumes it: a clipped or
+    immersed mesh must have no open boundaries other than the declared
+    cut. Count boundary edges, quantify open-seam length, and treat
+    integral quantities (volume, area, mass) computed on a non-closed
+    domain as invalid, not approximate.
+  - Cross-check one conserved integral against an independently
+    published value for canonical systems (a domain's computed volume,
+    area, mass, or total charge vs its documented value). This is the
+    cheapest whole-pipeline test that exists; its absence is a finding.
+  - Hardcoded selections (surface/patch tags, column indices, band or
+    crop ranges) require a recorded rationale and a completeness check.
+    An unexplained magic subset of a source artifact is a provenance
+    gap even when the result "looks right".
+- **Gross-deviation differential diagnosis.** When a computed quantity
+  for a well-characterized system misses an independent reference by
+  far more than the plausible error budget, the null hypothesis is a
+  defect in the computation, not in the reference or source artifact.
+  Before accepting any attribution to external data, walk the standard
+  defect ladder and show your work: units → scale → datum → selection/
+  closure → sign/convention → the data itself. "Source data deficient"
+  requires the same affirmative evidence bar as "fabrication"; a gate
+  failure alone attributes nothing.
 
-## 6. Performance and engineering claims
+## 7. Performance and engineering claims
 
 - Audit this phase only when performance or engineering claims are in
   scope. Give uncited superlatives ("fastest", "most accurate") their
@@ -209,7 +284,7 @@ defective path.
   region. Force failure paths and confirm fallbacks are loud (typed,
   reported), never silent degradation.
 
-## 7. The report
+## 8. The report
 
 Use [references/report-template.md](references/report-template.md).
 Rank adverse findings by impact, but keep these fields independent:
@@ -218,17 +293,25 @@ Rank adverse findings by impact, but keep these fields independent:
   or out of scope. In static mode use artifact-traceable, untraceable,
   or contradicted instead.
 - **Finding type**: circular oracle, vacuous test, provenance gap,
-  tolerance mismatch, mutation survivor, unsupported claim, or another
-  precise mechanism.
-- **Impact**: critical, high, medium, or low.
+  tolerance mismatch, mutation survivor, equation-transcription error,
+  regime violation, unverifiable citation, unsupported claim,
+  misattributed discrepancy (the deviation is real but blamed on the
+  wrong cause — e.g. a pipeline defect reported as a source-data
+  deficiency), or another precise mechanism.
+- **Impact**: critical, high, medium, or low. Conservative labeling
+  does not cap impact: a wrong causal attribution wrapped in honest
+  "diagnostic only" caveats is rated by the consequences of the wrong
+  conclusion (abandoned datasets, unnecessary procurement, a fixable
+  defect left standing), not by the modesty of its wrapper.
 - **Confidence**: high, medium, or low.
 
 Reserve fabrication for a separately justified allegation backed by
 affirmative evidence. Every finding must cite exact file:line, commit,
 primary-source location, command output, or shown derivation; label the
 evidence class; and name the documented claims affected. Include the
-full mutation table, oracle-independence table, and a claim-by-claim
-verdict for the Phase-0 ledger.
+full mutation table, oracle-independence table, equation-verification
+ledger (equation → source location → term-by-term result), and a
+claim-by-claim verdict for the Phase-0 ledger.
 
 In static or mixed mode, list everything execution could not establish.
 End with exact commands and results, environment details, branch,

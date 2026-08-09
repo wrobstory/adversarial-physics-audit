@@ -53,6 +53,11 @@ Grade each oracle `fully independent`, `partially independent`, or
 | Dataset | Primary source location | Transcription | Transformations | Applicability | Verdict |
 |---|---|---|---|---|---|
 
+Include domain-construction artifacts (meshes, clipped/scaled/digitized
+representations) as rows; record closure and dimension cross-checks
+under Transformations. Any gate failure attributed to source data must
+cite the differential-diagnosis evidence supporting that attribution.
+
 ## Execution boundary
 
 - Exact commands and results
