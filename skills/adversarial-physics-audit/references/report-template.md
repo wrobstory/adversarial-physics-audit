@@ -24,7 +24,9 @@ Order adverse findings by impact. For each finding record:
   inferred, or unverified
 - Exact artifact location, command and result, or shown derivation
 - Affected claim IDs
-- Disconfirming evidence considered
+- Disconfirming evidence considered — and for every suspect recorded as
+  cleared: the experiment used, the result that would have confirmed the
+  suspect, and why the experiment had power to produce it
 
 ## Claim ledger
 
